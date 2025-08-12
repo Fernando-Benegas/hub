@@ -7,69 +7,26 @@ We can start:
 1. on [Kubernetes](#on-kubernetes)
 2. on [Linux](#on-linux)
 
+### Pre-requisites
+- A Traefik Hub account
+- [Helm](https://helm.sh/) installed
+
 ## On Kubernetes
 
 For this tutorial, we deploy Traefik Hub API Gateway on a Kubernetes cluster. It's possible to use alternatives such as [kind](https://kind.sigs.k8s.io), [k3d](https://k3d.io/), [k3s](https://k3s.io/) cloud providers, and others.
 
 **:warning: It's important to disable the built-in Traefik ingress for k3d and k3s clusters. Refer to their documentation to see how to disable it**
-'''
-First, clone the GitHub repository dedicated to tutorials:
+
+'''First, clone the GitHub repository dedicated to tutorials:
 
 ```shell
 git clone https://github.com/traefik/hub.git
 cd hub
 ```
 
-### Create a Kubernetes cluster using k3d
-
-```shell
-k3d cluster create traefik-hub --port 80:80@loadbalancer --port 443:443@loadbalancer --port 8000:8000@loadbalancer --k3s-arg "--disable=traefik@server:0"
-```
-
-### Create a Kubernetes cluster using kind
-
-kind requires some configuration to use an IngressController on localhost. See the following example:
-
-<details>
-
-<summary>Create the cluster</summary>
-
-Ports need to be mapped for HTTP and HTTPS for kind with this config:
-
-```yaml
-kind: Cluster
-apiVersion: kind.x-k8s.io/v1alpha4
-name: traefik-hub
-nodes:
-- role: control-plane
-  extraPortMappings:
-  - containerPort: 30000
-    hostPort: 80
-    protocol: TCP
-  - containerPort: 30001
-    hostPort: 443
-    protocol: TCP
-```
-
-```shell
-kind create cluster --config=src/kind/config.yaml
-kubectl cluster-info
-kubectl wait --for=condition=ready nodes traefik-hub-control-plane
-```
-
-And add a load balancer (LB) to it:
-
-```shell
-kubectl apply -f src/kind/metallb-native.yaml
-kubectl wait --namespace metallb-system --for=condition=ready pod --selector=app=metallb --timeout=90s
-kubectl apply -f src/kind/metallb-config.yaml
-```
-
-</details>
-
 ### Step 1: Install Traefik Hub API Gateway
 
-Log in to the [Traefik Hub Online Dashboard](https://hub.traefik.io), open the page to [generate a new agent](https://hub.traefik.io/agents/new).
+Log in to the [Traefik Hub Online Dashboard](https://hub.traefik.io), open the page Gateways to [create a new gateway](https://hub.traefik.io/gateways/new?returnTo=%2Fgateways).
 
 **:warning: Do not install the agent, but copy the token.**
 
