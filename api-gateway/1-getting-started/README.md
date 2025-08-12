@@ -33,7 +33,7 @@ Click on Quick getting started instruction and select Kubernetes option.
 
 Copy the content of Configuration box
 
-Open a terminal and run the copied commands to set you new gateway.
+Open a terminal and run the copied commands to install Traefik Hub using Helm.
 
 ```shell
 # Add the Helm repository
@@ -45,6 +45,23 @@ kubectl create secret generic traefik-hub-license --namespace traefik --from-lit
 helm upgrade --install --namespace traefik traefik traefik/traefik \
   --set hub.token=traefik-hub-license \
   --set image.registry=ghcr.io --set image.repository=traefik/traefik-hub --set image.tag=v3.17.3
+```
+
+It should deploy Traefik Hub on your cluster.
+
+```shell
+"traefik" has been added to your repositories
+namespace/traefik created
+secret/traefik-hub-license created
+Release "traefik" does not exist. Installing it now.
+NAME: traefik
+LAST DEPLOYED: Mon Aug 12 20:00:00 2024
+NAMESPACE: traefik
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+traefik with ghcr.io/traefik/traefik-hub:v3.17.3 has been deployed successfully on traefik namespace !
 ```
 
 **If** Traefik Hub API Gateway is **already** installed, we can instead upgrade the Traefik Hub API Gateway instance:
@@ -64,7 +81,7 @@ helm upgrade traefik -n traefik --wait \
   --set ingressRoute.dashboard.entryPoints={web} \
   --set image.registry=ghcr.io \
   --set image.repository=traefik/traefik-hub \
-  --set image.tag=v3.14.1 \
+  --set image.tag=v3.17.3 \
   --set ports.web.nodePort=30000 \
   --set ports.websecure.nodePort=30001 \
    traefik/traefik
