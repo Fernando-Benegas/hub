@@ -10,12 +10,13 @@ We can start:
 ### Pre-requisites
 - A Traefik Hub account
 - [Helm](https://helm.sh/) installed
+- Allow outgoing requests to api.traefik.io on HTTPS ports (TCP/443).
 
 ## On Kubernetes
 
 For this tutorial, we deploy Traefik Hub API Gateway on a Kubernetes cluster. It's possible to use alternatives such as [kind](https://kind.sigs.k8s.io), [k3d](https://k3d.io/), [k3s](https://k3s.io/) cloud providers, and others.
 
-**:warning: It's important to disable the built-in Traefik ingress for k3d and k3s clusters. Refer to their documentation to see how to disable it**
+**:warning: It's important to disable the built-in Traefik ingress for k3d and k3s clusters to avoid possible conflicts. Refer to their documentation to see how to disable it**
 
 '''First, clone the GitHub repository dedicated to tutorials:
 
@@ -28,38 +29,22 @@ cd hub
 
 Log in to the [Traefik Hub Online Dashboard](https://hub.traefik.io), open the page Gateways to [create a new gateway](https://hub.traefik.io/gateways/new?returnTo=%2Fgateways).
 
-**:warning: Do not install the agent, but copy the token.**
+Click on Quick getting started instruction and select Kubernetes option.
 
-Open a terminal and run the following commands to create the required secret.
+Copy the content of Configuration box
 
-```shell
-export TRAEFIK_HUB_TOKEN=
-```
-
-```shell
-kubectl create namespace traefik
-kubectl create secret generic traefik-hub-license --namespace traefik --from-literal=token=$TRAEFIK_HUB_TOKEN
-```
-
-Install Traefik Hub API Gateway using Helm:
+Open a terminal and run the copied commands to set you new gateway.
 
 ```shell
 # Add the Helm repository
 helm repo add --force-update traefik https://traefik.github.io/charts
-# Install the Helm chart
-helm install traefik -n traefik --wait \
-  --version v34.4.1 \
+
+# Install the Ingress Controller
+kubectl create namespace traefik
+kubectl create secret generic traefik-hub-license --namespace traefik --from-literal=token=<traefik-hub-license>
+helm upgrade --install --namespace traefik traefik traefik/traefik \
   --set hub.token=traefik-hub-license \
-  --set ingressClass.enabled=false \
-  --set ingressRoute.dashboard.enabled=true \
-  --set ingressRoute.dashboard.matchRule='Host(`dashboard.docker.localhost`)' \
-  --set ingressRoute.dashboard.entryPoints={web} \
-  --set image.registry=ghcr.io \
-  --set image.repository=traefik/traefik-hub \
-  --set image.tag=v3.14.1 \
-  --set ports.web.nodePort=30000 \
-  --set ports.websecure.nodePort=30001 \
-   traefik/traefik
+  --set image.registry=ghcr.io --set image.repository=traefik/traefik-hub --set image.tag=v3.17.3
 ```
 
 **If** Traefik Hub API Gateway is **already** installed, we can instead upgrade the Traefik Hub API Gateway instance:
