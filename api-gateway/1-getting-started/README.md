@@ -9,8 +9,10 @@ We can start:
 
 ## On Kubernetes
 
-For this tutorial, we deploy Traefik Hub API Gateway on a [k3d](https://k3d.io/) cluster. It's possible to use alternatives such as [kind](https://kind.sigs.k8s.io), cloud providers, and others.
+For this tutorial, we deploy Traefik Hub API Gateway on a Kubernetes cluster. It's possible to use alternatives such as [kind](https://kind.sigs.k8s.io), [k3d](https://k3d.io/), [k3s](https://k3s.io/) cloud providers, and others.
 
+**:warning: It's important to disable the built-in Traefik ingress for k3d and k3s clusters. Refer to their documentation to see how to disable it**
+'''
 First, clone the GitHub repository dedicated to tutorials:
 
 ```shell
