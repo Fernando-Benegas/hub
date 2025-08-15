@@ -102,7 +102,6 @@ In this tutorial, APIs are implemented using a JSON server in Go; the source cod
 Let's deploy a [weather app](../../src/manifests/weather-app.yaml) exposing an API.
 
 ```shell
-kubectl apply -f src/manifests/apps-namespace.yaml
 kubectl apply -f src/manifests/weather-app.yaml
 ```
 
