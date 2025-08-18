@@ -25,6 +25,7 @@ git clone https://github.com/traefik/hub.git
 cd hub
 ```
 
+
 ### Step 1: Install Traefik Hub API Gateway
 
 Log in to the [Traefik Hub Online Dashboard](https://hub.traefik.io), open the page 'Gateways' to [create a new gateway](https://hub.traefik.io/gateways/new?returnTo=%2Fgateways).
@@ -48,7 +49,7 @@ helm upgrade --install --namespace traefik traefik traefik/traefik \
   --set hub.token=traefik-hub-license \
   --set image.registry=ghcr.io \
   --set image.repository=traefik/traefik-hub \
-  --set image.tag=v3.17.3
+  --set image.tag=latest-v3
 ```
 
 It should deploy Traefik Hub on your cluster.
@@ -70,9 +71,12 @@ traefik with ghcr.io/traefik/traefik-hub:v3.17.3 has been deployed successfully 
 
 **If** Traefik Hub API Gateway is **already** installed, copy the new token generated from the gateway creation page and use it to generate the `traefik-hub-license` secret :
 
+```shell
+export TRAEFIK_HUB_TOKEN= <paste-token-here>
+```
 
 ```shell
-kubectl create secret generic traefik-hub-license --namespace traefik --from-literal=token=<traefik-hub-license>
+kubectl create secret generic traefik-hub-license --namespace traefik --from-literal=token=$TRAEFIK_HUB_TOKEN
 ```
 Then, upgrade Traefik helm chart:
 
@@ -82,7 +86,7 @@ kubectl apply --server-side --force-conflicts -k https://github.com/traefik/trae
 # Update the Helm repository
 helm repo update
 #Create the traefik-hub-license secret
-kubectl create secret generic traefik-hub-license --namespace traefik --from-literal=token=<traefik-hub-license>
+kubectl create secret generic traefik-hub-license --namespace traefik --from-literal=token=$TRAEFIK_HUB_TOKEN
 # Upgrade the Helm chart
 helm upgrade traefik -n traefik --wait traefik/traefik \
   --set hub.token=traefik-hub-license \
@@ -91,7 +95,6 @@ helm upgrade traefik -n traefik --wait traefik/traefik \
   --set image.tag=latest-v3 \
 ```
 
-Now, we can access the local dashboard: http://localhost/ 
 
 ### Step 2: Deploy an API as an Ingress
 
@@ -129,7 +132,7 @@ spec:
   entryPoints:
     - web
   routes:
-  - match: Host(`getting-started.apigateway.docker.localhost`) && PathPrefix(`/weather`)
+  - match: Host(`localhost`) && PathPrefix(`/weather`)
     kind: Rule
     services:
     - name: weather-app
@@ -149,7 +152,7 @@ ingressroute.traefik.io/getting-started-apigateway created
 This API can be accessed using curl:
 
 ```shell
-curl http://getting-started.apigateway.docker.localhost/weather
+curl http://localhost/weather
 ```
 
 ```json
